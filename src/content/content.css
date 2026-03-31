@@ -34,6 +34,10 @@
   z-index: 2147483647 !important;
   display: block !important;
   pointer-events: auto !important;
+  -webkit-backdrop-filter: blur(4px) !important;
+  backdrop-filter: blur(4px) !important;
+  background: rgba(0, 0, 0, 0.5) !important;
+  animation: overlay-fade-in 0.15s ease;
 
   --radius: 0.625rem;
   --background: oklch(1 0 0);
@@ -56,6 +60,7 @@
 
 @media (prefers-color-scheme: dark) {
   :host {
+    background: rgba(0, 0, 0, 0.65) !important;
     --background: oklch(0.145 0 0);
     --foreground: oklch(0.985 0 0);
     --primary: oklch(0.922 0 0);

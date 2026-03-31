@@ -161,7 +161,7 @@ export function RenameModal({ savedEntry, originalTitle, url, onClose }: RenameM
 
   return (
     <div
-      className="fixed inset-0 z-[2147483647] flex items-center justify-center bg-black/40 font-sans animate-[overlay-fade-in_0.15s_ease] dark:bg-black/60"
+      className="fixed inset-0 z-[2147483647] flex items-center justify-center font-sans animate-[overlay-fade-in_0.15s_ease]"
       onClick={handleOverlayClick}
       onMouseDown={blockEvent}
       onMouseUp={blockEvent}
@@ -176,7 +176,7 @@ export function RenameModal({ savedEntry, originalTitle, url, onClose }: RenameM
         role="dialog"
         aria-modal="true"
         aria-label="Rename tab"
-        className="w-[480px] max-w-[calc(100vw-32px)] rounded-xl border border-border bg-background p-5 text-foreground shadow-[0_20px_60px_rgba(0,0,0,0.15),0_4px_16px_rgba(0,0,0,0.1)] animate-[modal-slide-in_0.15s_ease] dark:shadow-[0_20px_60px_rgba(0,0,0,0.4),0_4px_16px_rgba(0,0,0,0.3)]"
+        className="w-[480px] max-w-[calc(100vw-32px)] rounded-xl border border-border bg-background p-5 text-foreground shadow-[0_25px_70px_rgba(0,0,0,0.2),0_6px_20px_rgba(0,0,0,0.12),0_0_0_1px_rgba(255,255,255,0.06)] ring-1 ring-white/10 animate-[modal-slide-in_0.15s_ease] dark:shadow-[0_25px_70px_rgba(0,0,0,0.5),0_6px_20px_rgba(0,0,0,0.35),0_0_40px_rgba(255,255,255,0.03)] dark:ring-white/[0.08]"
         onClick={handleModalClick}
         onKeyDown={handleKeyDown}
       >
