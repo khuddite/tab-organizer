@@ -176,7 +176,7 @@ export function RenameModal({ savedEntry, originalTitle, url, onClose }: RenameM
         role="dialog"
         aria-modal="true"
         aria-label="Rename tab"
-        className="w-[480px] max-w-[calc(100vw-32px)] rounded-xl border border-border bg-background p-5 text-foreground shadow-[0_25px_70px_rgba(0,0,0,0.2),0_6px_20px_rgba(0,0,0,0.12),0_0_0_1px_rgba(255,255,255,0.06)] ring-1 ring-white/10 animate-[modal-slide-in_0.15s_ease] dark:shadow-[0_25px_70px_rgba(0,0,0,0.5),0_6px_20px_rgba(0,0,0,0.35),0_0_40px_rgba(255,255,255,0.03)] dark:ring-white/[0.08]"
+        className="w-[480px] max-w-[calc(100vw-32px)] rounded-xl border border-border/60 bg-background p-5 text-foreground shadow-[0_25px_70px_rgba(0,0,0,0.2),0_6px_20px_rgba(0,0,0,0.12)] ring-1 ring-black/5 animate-[modal-slide-in_0.15s_ease] dark:border-zinc-600 dark:shadow-[0_25px_70px_rgba(0,0,0,0.5),0_6px_20px_rgba(0,0,0,0.35)] dark:ring-zinc-600/20"
         onClick={handleModalClick}
         onKeyDown={handleKeyDown}
       >
