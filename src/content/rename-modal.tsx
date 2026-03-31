@@ -81,6 +81,14 @@ export function RenameModal({ savedEntry, originalTitle, url, onClose }: RenameM
     inputRef.current?.focus()
   }, [])
 
+  const handleEmojiClear = useCallback((e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setSelectedEmoji('')
+    setPickerVisible(false)
+    inputRef.current?.focus()
+  }, [])
+
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -176,15 +184,27 @@ export function RenameModal({ savedEntry, originalTitle, url, onClose }: RenameM
 
         {/* Input row */}
         <div className="relative mb-3 flex items-center gap-2">
-          <button
-            ref={emojiBtnRef}
-            type="button"
-            title="Add emoji prefix"
-            onClick={handleEmojiToggle}
-            className={`flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-lg border bg-input text-xl transition-colors hover:border-ring ${pickerVisible ? 'border-ring' : 'border-border'}`}
-          >
-            {selectedEmoji || '😀'}
-          </button>
+          <div className="relative shrink-0">
+            <button
+              ref={emojiBtnRef}
+              type="button"
+              title={selectedEmoji ? 'Change emoji' : 'Add emoji prefix'}
+              onClick={handleEmojiToggle}
+              className={`flex size-10 cursor-pointer items-center justify-center rounded-lg border bg-input text-xl transition-colors hover:border-ring ${pickerVisible ? 'border-ring' : 'border-border'}`}
+            >
+              {selectedEmoji || '😀'}
+            </button>
+            {selectedEmoji && (
+              <button
+                type="button"
+                title="Remove emoji"
+                onClick={handleEmojiClear}
+                className="absolute -top-1.5 -right-1.5 z-[1] flex size-[18px] cursor-pointer items-center justify-center rounded-full border border-border bg-background text-[10px] leading-none text-muted-foreground shadow-sm transition-colors hover:border-destructive hover:bg-destructive hover:text-white"
+              >
+                ✕
+              </button>
+            )}
+          </div>
           <input
             ref={inputRef}
             type="text"
@@ -213,15 +233,15 @@ export function RenameModal({ savedEntry, originalTitle, url, onClose }: RenameM
         </div>
 
         {/* Match mode */}
-        <div className="mb-4 flex gap-2">
+        <div className="mb-4 flex gap-0.5 rounded-lg bg-muted p-0.5">
           <button
             type="button"
             title="Apply to this exact URL only"
             onClick={() => setMatchMode('exact')}
-            className={`flex-1 cursor-pointer rounded-lg border px-3 py-1.5 text-center text-xs transition-colors ${
+            className={`flex-1 cursor-pointer rounded-md border-none px-3 py-1.5 text-center text-xs transition-all ${
               matchMode === 'exact'
-                ? 'border-ring bg-ring/10 font-medium text-ring'
-                : 'border-border bg-input text-muted-foreground hover:border-ring hover:text-foreground'
+                ? 'bg-background font-medium text-foreground shadow-sm'
+                : 'bg-transparent text-muted-foreground hover:text-foreground'
             }`}
           >
             This URL
@@ -230,10 +250,10 @@ export function RenameModal({ savedEntry, originalTitle, url, onClose }: RenameM
             type="button"
             title="Apply to all pages on this domain"
             onClick={() => setMatchMode('domain')}
-            className={`flex-1 cursor-pointer rounded-lg border px-3 py-1.5 text-center text-xs transition-colors ${
+            className={`flex-1 cursor-pointer rounded-md border-none px-3 py-1.5 text-center text-xs transition-all ${
               matchMode === 'domain'
-                ? 'border-ring bg-ring/10 font-medium text-ring'
-                : 'border-border bg-input text-muted-foreground hover:border-ring hover:text-foreground'
+                ? 'bg-background font-medium text-foreground shadow-sm'
+                : 'bg-transparent text-muted-foreground hover:text-foreground'
             }`}
           >
             All of {hostname}
