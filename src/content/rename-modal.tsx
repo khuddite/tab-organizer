@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import EmojiPicker, { Theme } from 'emoji-picker-react'
+import type { EmojiClickData } from 'emoji-picker-react'
 import type { Message } from '@/shared/messages'
 import type { TabRenameEntry } from '@/shared/storage'
 import { normalizeUrl } from '@/shared/storage'
@@ -20,14 +22,11 @@ export function RenameModal({ savedEntry, originalTitle, url, onClose }: RenameM
 
   const [selectedEmoji, setSelectedEmoji] = useState(savedEntry?.emoji ?? '')
   const [matchMode, setMatchMode] = useState<'exact' | 'domain'>(savedEntry?.matchMode ?? 'exact')
-  const [titleValue, setTitleValue] = useState(
-    selectedEmoji ? `${savedEntry?.emoji ?? ''} ${savedText}` : savedText,
-  )
+  const [titleValue, setTitleValue] = useState(savedText)
   const [pickerVisible, setPickerVisible] = useState(false)
 
   const inputRef = useRef<HTMLInputElement>(null)
   const pickerWrapperRef = useRef<HTMLDivElement>(null)
-  const pickerMountedRef = useRef(false)
   const emojiBtnRef = useRef<HTMLButtonElement>(null)
   const modalRef = useRef<HTMLDivElement>(null)
 
@@ -43,17 +42,14 @@ export function RenameModal({ savedEntry, originalTitle, url, onClose }: RenameM
   }, [])
 
   const handleSave = useCallback(async () => {
-    const rawText = titleValue.trim()
-    if (!rawText) return
+    const textPart = titleValue.trim()
+    if (!textPart) return
 
-    const parts = rawText.match(/^(\p{Emoji_Presentation}|\p{Extended_Pictographic})\s+(.*)/u)
-    const emoji = parts ? parts[1] : selectedEmoji
-    const textPart = parts ? parts[2] : selectedEmoji ? rawText.replace(selectedEmoji, '').trim() : rawText
-    const customTitle = emoji ? `${emoji} ${textPart}` : textPart
+    const customTitle = selectedEmoji ? `${selectedEmoji} ${textPart}` : textPart
 
     const entry: TabRenameEntry = {
       customTitle,
-      emoji,
+      emoji: selectedEmoji,
       originalTitle,
       matchMode,
       url: normalizeUrl(url, matchMode),
@@ -75,30 +71,15 @@ export function RenameModal({ savedEntry, originalTitle, url, onClose }: RenameM
     onClose()
   }, [originalTitle, url, onClose])
 
-  const handleEmojiToggle = useCallback(async () => {
-    const nextVisible = !pickerVisible
-    setPickerVisible(nextVisible)
+  const handleEmojiToggle = useCallback(() => {
+    setPickerVisible((v) => !v)
+  }, [])
 
-    if (nextVisible && !pickerMountedRef.current) {
-      pickerMountedRef.current = true
-      await import('emoji-picker-element')
-      const wrapper = pickerWrapperRef.current
-      if (!wrapper) return
-      const pickerEl = document.createElement('emoji-picker')
-      pickerEl.addEventListener('emoji-click', (e: Event) => {
-        const detail = (e as CustomEvent<{ unicode: string }>).detail
-        const newEmoji = detail.unicode
-        setSelectedEmoji(newEmoji)
-        setPickerVisible(false)
-        setTitleValue((prev) => {
-          const bare = prev.replace(/^\S+\s+/, '')
-          return `${newEmoji} ${bare}`
-        })
-        inputRef.current?.focus()
-      })
-      wrapper.appendChild(pickerEl)
-    }
-  }, [pickerVisible])
+  const handleEmojiSelect = useCallback((emojiData: EmojiClickData) => {
+    setSelectedEmoji(emojiData.emoji)
+    setPickerVisible(false)
+    inputRef.current?.focus()
+  }, [])
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
@@ -213,10 +194,22 @@ export function RenameModal({ savedEntry, originalTitle, url, onClose }: RenameM
             onChange={(e) => setTitleValue(e.target.value)}
             className="h-10 flex-1 rounded-lg border border-border bg-input px-3 text-sm text-foreground outline-none transition-[border-color,box-shadow] placeholder:text-muted-foreground focus:border-ring focus:shadow-[0_0_0_3px_var(--color-ring)/15%]"
           />
-          <div
-            ref={pickerWrapperRef}
-            className={`absolute top-[calc(100%+8px)] left-0 z-10 ${pickerVisible ? '' : 'hidden'}`}
-          />
+          {pickerVisible && (
+            <div
+              ref={pickerWrapperRef}
+              className="absolute top-[calc(100%+8px)] left-0 z-10"
+            >
+              <EmojiPicker
+                onEmojiClick={handleEmojiSelect}
+                theme={Theme.AUTO}
+                width={350}
+                height={400}
+                skinTonesDisabled
+                searchPlaceholder="Search emoji…"
+                lazyLoadEmojis
+              />
+            </div>
+          )}
         </div>
 
         {/* Match mode */}
