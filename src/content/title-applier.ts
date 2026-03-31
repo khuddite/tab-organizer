@@ -1,19 +1,19 @@
-import type { Message } from '../shared/messages'
+import type { Message } from '../shared/messages';
 
-let appliedTitle: string | null = null
-let observer: MutationObserver | null = null
+let appliedTitle: string | null = null;
+let observer: MutationObserver | null = null;
 
 // Apply the saved title for the current URL, then watch for changes.
 export async function applyTitleFromStorage(): Promise<void> {
-  const url = location.href
-  const msg: Message = { type: 'GET_RENAME_FOR_URL', url }
+  const url = location.href;
+  const msg: Message = { type: 'GET_RENAME_FOR_URL', url };
 
   try {
-    const response = await chrome.runtime.sendMessage<Message, Message>(msg)
+    const response = await chrome.runtime.sendMessage<Message, Message>(msg);
     if (response?.type === 'RENAME_DATA_RESPONSE' && response.entry) {
-      appliedTitle = response.entry.customTitle
-      applyTitle()
-      watchTitle()
+      appliedTitle = response.entry.customTitle;
+      applyTitle();
+      watchTitle();
     }
   } catch {
     // Extension context not ready yet — will retry via content script init
@@ -22,73 +22,77 @@ export async function applyTitleFromStorage(): Promise<void> {
 
 function applyTitle(): void {
   if (appliedTitle && document.title !== appliedTitle) {
-    document.title = appliedTitle
+    document.title = appliedTitle;
   }
 }
 
 // MutationObserver on <title> prevents the page from overwriting our custom title.
 function watchTitle(): void {
-  if (observer) return
+  if (observer) return;
 
   // Wait for <head> to be available (document_start may fire before <head> exists)
   const start = (): void => {
-    const titleEl = document.querySelector('title')
-    const target = titleEl?.parentElement ?? document.documentElement
+    const titleEl = document.querySelector('title');
+    const target = titleEl?.parentElement ?? document.documentElement;
 
     observer = new MutationObserver(() => {
-      applyTitle()
-    })
+      applyTitle();
+    });
 
-    observer.observe(target, { subtree: true, childList: true, characterData: true })
-  }
+    observer.observe(target, {
+      subtree: true,
+      childList: true,
+      characterData: true,
+    });
+  };
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', start, { once: true })
+    document.addEventListener('DOMContentLoaded', start, { once: true });
   } else {
-    start()
+    start();
   }
 }
 
 // Re-run lookup when the URL changes (SPA navigation via pushState/replaceState).
 function handleUrlChange(): void {
-  const newUrl = location.href
-  if (newUrl === lastUrl) return
-  lastUrl = newUrl
+  const newUrl = location.href;
+  if (newUrl === lastUrl) return;
+  lastUrl = newUrl;
 
   // Disconnect old observer, reset state
-  observer?.disconnect()
-  observer = null
-  appliedTitle = null
+  observer?.disconnect();
+  observer = null;
+  appliedTitle = null;
 
-  applyTitleFromStorage()
+  applyTitleFromStorage();
 }
 
-let lastUrl = location.href
+let lastUrl = location.href;
 
-window.addEventListener('popstate', handleUrlChange)
-window.addEventListener('hashchange', handleUrlChange)
+window.addEventListener('popstate', handleUrlChange);
+window.addEventListener('hashchange', handleUrlChange);
 
 // Patch history methods to catch pushState/replaceState (SPA navigation)
-const originalPushState = history.pushState.bind(history)
-const originalReplaceState = history.replaceState.bind(history)
+const originalPushState = history.pushState.bind(history);
+const originalReplaceState = history.replaceState.bind(history);
 
 history.pushState = function (...args) {
-  originalPushState(...args)
-  handleUrlChange()
-}
+  originalPushState(...args);
+  handleUrlChange();
+};
 
 history.replaceState = function (...args) {
-  originalReplaceState(...args)
-  handleUrlChange()
-}
+  originalReplaceState(...args);
+  handleUrlChange();
+};
 
 export function setAppliedTitle(title: string | null): void {
-  appliedTitle = title
+  appliedTitle = title;
   if (title) {
-    applyTitle()
-    watchTitle()
+    applyTitle();
+    watchTitle();
   } else {
-    observer?.disconnect()
-    observer = null
+    observer?.disconnect();
+    observer = null;
   }
 }

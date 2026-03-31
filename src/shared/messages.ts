@@ -1,4 +1,4 @@
-import type { TabRenameEntry } from './storage'
+import type { TabRenameEntry } from './storage';
 
 export type Message =
   // Background → Content script: open the rename popup
@@ -8,7 +8,11 @@ export type Message =
   | { type: 'GET_RENAME_FOR_URL'; url: string }
 
   // Background → Content script: response with saved entry (or null)
-  | { type: 'RENAME_DATA_RESPONSE'; entry: TabRenameEntry | null; originalTitle: string }
+  | {
+      type: 'RENAME_DATA_RESPONSE';
+      entry: TabRenameEntry | null;
+      originalTitle: string;
+    }
 
   // Content script → Background: user submitted rename (tabId resolved from sender)
   | { type: 'RENAME_TAB'; url: string; entry: TabRenameEntry }
@@ -29,4 +33,4 @@ export type Message =
   | { type: 'FOCUS_TAB_BY_URL'; url: string }
 
   // Popup page → Background: trigger rename popup in active tab
-  | { type: 'TRIGGER_RENAME_IN_ACTIVE_TAB' }
+  | { type: 'TRIGGER_RENAME_IN_ACTIVE_TAB' };

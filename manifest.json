@@ -4,12 +4,7 @@
   "version": "1.0.0",
   "description": "Rename your browser tabs with custom titles and emoji prefixes.",
 
-  "permissions": [
-    "tabs",
-    "storage",
-    "activeTab",
-    "scripting"
-  ],
+  "permissions": ["tabs", "storage", "activeTab", "scripting"],
 
   "background": {
     "service_worker": "src/background/service-worker.ts",
