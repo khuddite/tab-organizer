@@ -55,6 +55,11 @@ async function injectPopup(): Promise<void> {
   savedBodyOverflow = document.body.style.overflow;
   document.body.style.overflow = 'hidden';
 
+  // Prevent keyboard events from leaking to the host page (e.g. GitHub hotkeys)
+  for (const evt of ['keydown', 'keyup', 'keypress'] as const) {
+    shadowHost.addEventListener(evt, (e) => e.stopPropagation());
+  }
+
   document.body.appendChild(shadowHost);
 
   reactRoot = createRoot(container);

@@ -26,31 +26,17 @@ export function RenameModal({
     : document.title;
 
   const initialEmoji = savedEntry?.emoji ?? '';
-  const initialMatchMode = savedEntry?.matchMode ?? 'exact';
-
   const [selectedEmoji, setSelectedEmoji] = useState(initialEmoji);
-  const [matchMode, setMatchMode] = useState<'exact' | 'domain'>(
-    initialMatchMode,
-  );
+  const matchMode = 'exact' as const;
   const [titleValue, setTitleValue] = useState(savedText);
   const [pickerVisible, setPickerVisible] = useState(false);
 
-  const hasChange =
-    titleValue !== savedText ||
-    selectedEmoji !== initialEmoji ||
-    matchMode !== initialMatchMode;
+  const hasChange = titleValue !== savedText || selectedEmoji !== initialEmoji;
 
   const inputRef = useRef<HTMLInputElement>(null);
   const pickerWrapperRef = useRef<HTMLDivElement>(null);
   const emojiBtnRef = useRef<HTMLButtonElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
-
-  let hostname = '';
-  try {
-    hostname = new URL(url).hostname;
-  } catch {
-    hostname = url;
-  }
 
   useEffect(() => {
     inputRef.current?.focus();
@@ -162,6 +148,9 @@ export function RenameModal({
     <div
       className="fixed inset-0 z-[2147483647] flex animate-[overlay-fade-in_0.15s_ease] items-center justify-center font-sans"
       onClick={handleOverlayClick}
+      onKeyDown={blockEvent}
+      onKeyUp={blockEvent}
+      onKeyPress={blockEvent}
       onMouseDown={blockEvent}
       onMouseUp={blockEvent}
       onDoubleClick={blockEvent}
@@ -242,34 +231,6 @@ export function RenameModal({
               />
             </div>
           )}
-        </div>
-
-        {/* Match mode */}
-        <div className="bg-muted mb-4 flex gap-0.5 rounded-lg p-0.5">
-          <button
-            type="button"
-            title="Apply to this exact URL only"
-            onClick={() => setMatchMode('exact')}
-            className={`flex-1 cursor-pointer rounded-md border-none px-3 py-1.5 text-center text-xs transition-all ${
-              matchMode === 'exact'
-                ? 'bg-background text-foreground font-medium shadow-sm'
-                : 'text-muted-foreground hover:text-foreground bg-transparent'
-            }`}
-          >
-            This URL
-          </button>
-          <button
-            type="button"
-            title="Apply to all pages on this domain"
-            onClick={() => setMatchMode('domain')}
-            className={`flex-1 cursor-pointer rounded-md border-none px-3 py-1.5 text-center text-xs transition-all ${
-              matchMode === 'domain'
-                ? 'bg-background text-foreground font-medium shadow-sm'
-                : 'text-muted-foreground hover:text-foreground bg-transparent'
-            }`}
-          >
-            All of {hostname}
-          </button>
         </div>
 
         {/* Actions */}

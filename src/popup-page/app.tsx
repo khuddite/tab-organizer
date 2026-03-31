@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Pencil, ArrowRight, X } from 'lucide-react';
+import { Pencil, X } from 'lucide-react';
 import type { Message } from '@/shared/messages';
 import type { TabRenameEntry } from '@/shared/storage';
 import { Button } from '@/components/ui/button';
@@ -113,7 +113,19 @@ function RenameItem({
   onGoToTab: (url: string) => void;
 }) {
   return (
-    <div className="hover:bg-accent flex items-center gap-2 rounded-lg px-2 py-2 transition-colors">
+    <div
+      className="hover:bg-accent flex cursor-pointer items-center gap-2 rounded-lg px-2 py-2 transition-colors"
+      role="button"
+      tabIndex={0}
+      title="Go to this tab"
+      onClick={() => onGoToTab(entry.url)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onGoToTab(entry.url);
+        }
+      }}
+    >
       <div className="min-w-0 flex-1">
         <div
           className="truncate text-[13px] font-medium"
@@ -128,25 +140,18 @@ function RenameItem({
           <span className="truncate">{entry.url}</span>
         </div>
       </div>
-      <div className="flex shrink-0 gap-1">
-        <Button
-          variant="outline"
-          size="icon-xs"
-          title="Go to this tab"
-          onClick={() => onGoToTab(entry.url)}
-        >
-          <ArrowRight />
-        </Button>
-        <Button
-          variant="outline"
-          size="icon-xs"
-          title="Remove this rename"
-          onClick={() => onDelete(entryKey)}
-          className="hover:border-destructive hover:text-destructive"
-        >
-          <X />
-        </Button>
-      </div>
+      <Button
+        variant="outline"
+        size="icon-xs"
+        title="Remove this rename"
+        onClick={(e) => {
+          e.stopPropagation();
+          onDelete(entryKey);
+        }}
+        className="hover:border-destructive hover:text-destructive shrink-0"
+      >
+        <X />
+      </Button>
     </div>
   );
 }
