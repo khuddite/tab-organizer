@@ -4,7 +4,6 @@ import type { Message } from '@/shared/messages'
 import type { TabRenameEntry } from '@/shared/storage'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { ScrollArea } from '@/components/ui/scroll-area'
 
 export function App() {
   const [renames, setRenames] = useState<Record<string, TabRenameEntry>>({})
@@ -52,8 +51,8 @@ export function App() {
   const entries = Object.entries(renames)
 
   return (
-    <div className="flex h-full w-[400px] flex-col">
-      <header className="flex items-center gap-2 border-b px-4 py-3">
+    <div className="flex max-h-[500px] w-[400px] flex-col">
+      <header className="shrink-0 flex items-center gap-2 border-b px-4 py-3">
         <span className="text-lg">🗂</span>
         <h1 className="flex-1 text-sm font-semibold">Tab Organizer</h1>
         <Button size="sm" onClick={handleTriggerRename} title="Open rename dialog for the current tab">
@@ -79,10 +78,10 @@ export function App() {
         </div>
       ) : (
         <>
-          <div className="px-4 pt-2.5 pb-1.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+          <div className="shrink-0 px-4 pt-2.5 pb-1.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
             Saved renames ({entries.length})
           </div>
-          <ScrollArea className="flex-1 px-2 pb-2">
+          <div className="min-h-0 flex-1 overflow-y-auto px-2 pb-2">
             <div className="space-y-0.5">
               {entries.map(([key, entry]) => (
                 <RenameItem
@@ -94,7 +93,7 @@ export function App() {
                 />
               ))}
             </div>
-          </ScrollArea>
+          </div>
         </>
       )}
     </div>
