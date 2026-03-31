@@ -20,10 +20,18 @@ export function RenameModal({ savedEntry, originalTitle, url, onClose }: RenameM
       : savedEntry.customTitle
     : document.title
 
-  const [selectedEmoji, setSelectedEmoji] = useState(savedEntry?.emoji ?? '')
-  const [matchMode, setMatchMode] = useState<'exact' | 'domain'>(savedEntry?.matchMode ?? 'exact')
+  const initialEmoji = savedEntry?.emoji ?? ''
+  const initialMatchMode = savedEntry?.matchMode ?? 'exact'
+
+  const [selectedEmoji, setSelectedEmoji] = useState(initialEmoji)
+  const [matchMode, setMatchMode] = useState<'exact' | 'domain'>(initialMatchMode)
   const [titleValue, setTitleValue] = useState(savedText)
   const [pickerVisible, setPickerVisible] = useState(false)
+
+  const hasChange =
+    titleValue !== savedText ||
+    selectedEmoji !== initialEmoji ||
+    matchMode !== initialMatchMode
 
   const inputRef = useRef<HTMLInputElement>(null)
   const pickerWrapperRef = useRef<HTMLDivElement>(null)
@@ -97,7 +105,8 @@ export function RenameModal({ savedEntry, originalTitle, url, onClose }: RenameM
       }
       if (e.key === 'Enter' && e.target !== emojiBtnRef.current) {
         e.preventDefault()
-        handleSave()
+        if (hasChange) handleSave()
+        else onClose()
       }
       if (e.key === 'Tab') {
         const modal = modalRef.current
@@ -120,7 +129,7 @@ export function RenameModal({ savedEntry, originalTitle, url, onClose }: RenameM
         }
       }
     },
-    [onClose, handleSave],
+    [onClose, handleSave, hasChange],
   )
 
   const blockEvent = useCallback((e: React.SyntheticEvent) => {
@@ -264,8 +273,9 @@ export function RenameModal({ savedEntry, originalTitle, url, onClose }: RenameM
         <div className="flex items-center gap-2">
           <button
             type="button"
+            disabled={!hasChange}
             onClick={handleSave}
-            className="h-9 flex-1 cursor-pointer rounded-lg border-none bg-primary text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            className="h-9 flex-1 cursor-pointer rounded-lg border-none bg-primary text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-40"
           >
             Save
           </button>
