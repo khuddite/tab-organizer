@@ -5,7 +5,14 @@ import react from '@vitejs/plugin-react';
 import manifest from './manifest.json';
 
 export default defineConfig({
-  plugins: [react(), crx({ manifest })],
+  plugins: [
+    react({
+      babel: {
+        plugins: ['babel-plugin-react-compiler'],
+      },
+    }),
+    crx({ manifest }),
+  ],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, 'src'),

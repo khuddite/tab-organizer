@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import EmojiPicker, { Theme } from 'emoji-picker-react';
 import type { EmojiClickData } from 'emoji-picker-react';
 import type { Message } from '@/shared/messages';
@@ -56,7 +56,7 @@ export function RenameModal({
     inputRef.current?.focus();
   }, []);
 
-  const handleSave = useCallback(async () => {
+  async function handleSave() {
     const textPart = titleValue.trim();
     if (!textPart) return;
 
@@ -78,102 +78,85 @@ export function RenameModal({
     await chrome.runtime.sendMessage(msg);
     setAppliedTitle(customTitle);
     onClose();
-  }, [
-    titleValue,
-    selectedEmoji,
-    matchMode,
-    originalTitle,
-    url,
-    savedEntry,
-    onClose,
-  ]);
+  }
 
-  const handleReset = useCallback(async () => {
+  async function handleReset() {
     setAppliedTitle(null);
     document.title = originalTitle;
     const msg: Message = { type: 'RESET_TAB', url };
     await chrome.runtime.sendMessage(msg);
     onClose();
-  }, [originalTitle, url, onClose]);
+  }
 
-  const handleEmojiToggle = useCallback(() => {
+  function handleEmojiToggle() {
     setPickerVisible((v) => !v);
-  }, []);
+  }
 
-  const handleEmojiSelect = useCallback((emojiData: EmojiClickData) => {
+  function handleEmojiSelect(emojiData: EmojiClickData) {
     setSelectedEmoji(emojiData.emoji);
     setPickerVisible(false);
     inputRef.current?.focus();
-  }, []);
+  }
 
-  const handleEmojiClear = useCallback((e: React.MouseEvent) => {
+  function handleEmojiClear(e: React.MouseEvent) {
     e.preventDefault();
     e.stopPropagation();
     setSelectedEmoji('');
     setPickerVisible(false);
     inputRef.current?.focus();
-  }, []);
+  }
 
-  const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (e.key === 'Escape') {
+  function handleKeyDown(e: React.KeyboardEvent) {
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      onClose();
+    }
+    if (e.key === 'Enter' && e.target !== emojiBtnRef.current) {
+      e.preventDefault();
+      if (hasChange) handleSave();
+      else onClose();
+    }
+    if (e.key === 'Tab') {
+      const modal = modalRef.current;
+      if (!modal) return;
+      const focusable = modal.querySelectorAll<HTMLElement>(
+        'input, button:not(:disabled), [tabindex]:not([tabindex="-1"])',
+      );
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      const active =
+        modal.getRootNode() instanceof ShadowRoot
+          ? (modal.getRootNode() as ShadowRoot).activeElement
+          : document.activeElement;
+      if (e.shiftKey && active === first) {
         e.preventDefault();
-        onClose();
-      }
-      if (e.key === 'Enter' && e.target !== emojiBtnRef.current) {
+        last.focus();
+      } else if (!e.shiftKey && active === last) {
         e.preventDefault();
-        if (hasChange) handleSave();
-        else onClose();
+        first.focus();
       }
-      if (e.key === 'Tab') {
-        const modal = modalRef.current;
-        if (!modal) return;
-        const focusable = modal.querySelectorAll<HTMLElement>(
-          'input, button:not(:disabled), [tabindex]:not([tabindex="-1"])',
-        );
-        if (!focusable.length) return;
-        const first = focusable[0];
-        const last = focusable[focusable.length - 1];
-        const active =
-          modal.getRootNode() instanceof ShadowRoot
-            ? (modal.getRootNode() as ShadowRoot).activeElement
-            : document.activeElement;
-        if (e.shiftKey && active === first) {
-          e.preventDefault();
-          last.focus();
-        } else if (!e.shiftKey && active === last) {
-          e.preventDefault();
-          first.focus();
-        }
-      }
-    },
-    [onClose, handleSave, hasChange],
-  );
+    }
+  }
 
-  const blockEvent = useCallback((e: React.SyntheticEvent) => {
+  function blockEvent(e: React.SyntheticEvent) {
     e.stopPropagation();
-  }, []);
+  }
 
-  const handleOverlayClick = useCallback(
-    (e: React.MouseEvent) => {
-      if (e.target === e.currentTarget) onClose();
-    },
-    [onClose],
-  );
+  function handleOverlayClick(e: React.MouseEvent) {
+    if (e.target === e.currentTarget) onClose();
+  }
 
-  const handleModalClick = useCallback(
-    (e: React.MouseEvent) => {
-      if (
-        pickerVisible &&
-        pickerWrapperRef.current &&
-        !pickerWrapperRef.current.contains(e.target as Node) &&
-        e.target !== emojiBtnRef.current
-      ) {
-        setPickerVisible(false);
-      }
-    },
-    [pickerVisible],
-  );
+  function handleModalClick(e: React.MouseEvent) {
+    if (
+      pickerVisible &&
+      pickerWrapperRef.current &&
+      !pickerWrapperRef.current.contains(e.target as Node) &&
+      e.target !== emojiBtnRef.current
+    ) {
+      setPickerVisible(false);
+    }
+  }
 
   return (
     <div

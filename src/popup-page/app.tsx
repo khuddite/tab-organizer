@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Pencil, ArrowRight, X } from 'lucide-react';
 import type { Message } from '@/shared/messages';
 import type { TabRenameEntry } from '@/shared/storage';
@@ -17,7 +17,7 @@ export function App() {
     });
   }, []);
 
-  const handleTriggerRename = useCallback(async () => {
+  async function handleTriggerRename() {
     try {
       const msg: Message = { type: 'TRIGGER_RENAME_IN_ACTIVE_TAB' };
       await chrome.runtime.sendMessage(msg);
@@ -25,9 +25,9 @@ export function App() {
     } catch {
       setError('Could not open rename dialog on this page.');
     }
-  }, []);
+  }
 
-  const handleDelete = useCallback(async (key: string) => {
+  async function handleDelete(key: string) {
     const msg: Message = { type: 'DELETE_RENAME', key };
     await chrome.runtime.sendMessage(msg);
     setRenames((prev) => {
@@ -35,13 +35,13 @@ export function App() {
       delete next[key];
       return next;
     });
-  }, []);
+  }
 
-  const handleGoToTab = useCallback(async (url: string) => {
+  async function handleGoToTab(url: string) {
     const msg: Message = { type: 'FOCUS_TAB_BY_URL', url };
     await chrome.runtime.sendMessage(msg);
     window.close();
-  }, []);
+  }
 
   if (!loaded) return null;
 
