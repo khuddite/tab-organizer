@@ -1,0 +1,6 @@
+export const DEFAULT_HOTKEY = 'Alt+R'
+export const BADGE_TEXT = '✎'
+export const BADGE_COLOR = '#4A90E2'
+export const STORAGE_KEY_RENAMES = 'renames'
+export const STORAGE_KEY_SETTINGS = 'settings'
+export const ROOT_ELEMENT_ID = 'tab-organizer-root'
